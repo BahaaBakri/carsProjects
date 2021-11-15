@@ -1,0 +1,72 @@
+import pandas as pd
+import numpy as np
+import sklearn
+from sklearn import preprocessing,linear_model
+import matplotlib.pyplot as plt
+
+#--------------------load data------------------------
+print('-'*30);print("LOAD DATA");print("-"*30)
+data=pd.read_csv("train-data.csv",sep=',')
+print(data.head())
+data=data[['Year','Kilometers_Driven','Fuel_Type','Transmission','Owner_Type','Engine','Power','Seats','Price']]
+print(data.head())
+print(data.isnull().sum())
+"""------process DATA--------------"""
+data['Power']=data['Power'].map(lambda i:float((str(i).replace(' bhp','')).replace('null','nan')))
+data['Engine']=data['Engine'].map(lambda i:float(str(i).replace(' CC','')))
+##########RER
+#data['Mileage']=data['Mileage'].map(lambda i:str(i))
+#data['Mileage']=data['Mileage'].map(lambda i:i[:i.find(" ")])
+
+le=preprocessing.LabelEncoder()
+data['Owner_Type']=le.fit_transform(data['Owner_Type'])#first 0 ,second 2 ,third 3 , fourth and above 1
+data['Transmission']=le.fit_transform(data['Transmission'])#Manual 1 ,Automatic 0
+data['Fuel_Type']=le.fit_transform(data['Fuel_Type'])#CNG 0 ,Diesel 1, Electric 2, Petrol 4, LPG 3
+#data.replace({'Fuel_Type':{'Petrol':0,'Diesel':1,'CNG':2}},inplace=True)
+
+print(data.head())
+print('-'*30);print("CHECKING NULL DATA");print("-"*30)
+print(data.isnull().sum())
+data=  data.dropna()
+print(data.isnull().sum())
+print('-'*30);print("HEAD");print("-"*30)
+print(data.head())
+
+
+print('-'*30);print("SPLIT DATA");print("-"*30)
+x=np.array(data.drop(['Price'],1))
+y=np.array(data['Price']*1000000)
+print("x",x.shape)
+print("y",y.shape)
+
+xTrain,xTest,yTrain,yTest=sklearn.model_selection.train_test_split(x,y,test_size=0.2,random_state=50)
+print("xTrain",xTrain.shape)
+print("xTest",xTest.shape)
+
+print('-'*30);print("TRAINING");print("-"*30)
+model =linear_model.LinearRegression()
+model.fit(xTrain,yTrain)
+
+accuracy=model.score(xTest,yTest)
+print(f"accuracy:{round(accuracy*100,3)}%")
+
+print("cofficients:",model.coef_)
+print("Intercept:",model.intercept_)
+m=[2012,87000,1,1,0,1248,88.76,7]
+m1=np.array(m).reshape(1,-1)
+
+print(model.predict(m1))
+print(f'rent amount preadictiom is {float(sum(m*model.coef_)+model.intercept_)}')
+training_data_prediction = model.predict(xTrain)
+plt.scatter(yTrain, training_data_prediction)
+plt.xlabel("Actual Price")
+plt.ylabel("Predicted Price")
+plt.title(" Actual Prices vs Predicted Prices")
+plt.show()
+test_data_prediction = model.predict(xTest)
+
+plt.scatter(yTest, test_data_prediction)
+plt.xlabel("Actual Price")
+plt.ylabel("Predicted Price")
+plt.title(" Actual Prices vs Predicted Prices")
+plt.show()

@@ -1,0 +1,19 @@
+{
+  "name": "CarsProject",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@syncfusion/ej2-base": "^19.1.54",
+    "@syncfusion/ej2-buttons": "^19.1.54",
+    "@syncfusion/ej2-popups": "^19.1.54",
+    "chart.js": "^2.9.4",
+    "material-icons": "^0.6.0"
+  }
+}
